@@ -846,10 +846,9 @@ input[type=range]::-webkit-slider-thumb {
       </div>
     </div>
 
-    <div style="margin-top:28px">
-      <button class="btn btn-primary" style="width:100%" onclick="goScreen('screen-info')">
-        Başla →
-      </button>
+    <div style="margin-top:28px;display:flex;flex-direction:column;gap:10px">
+      <button class="btn btn-primary" style="width:100%" onclick="goScreen('screen-info')">Başla →</button>
+      <button class="btn btn-secondary" style="width:100%" onclick="openDataTable()">📊 Veri Tablosunu Görüntüle</button>
     </div>
   </div>
 </div>
@@ -1156,6 +1155,7 @@ input[type=range]::-webkit-slider-thumb {
     <div id="tab-content-compare" class="tab-pane" style="display:none"></div>
 
     <div class="btn-row">
+      <button class="btn btn-secondary" onclick="openDataTable()">📊 Veri Tablosu</button>
       <button class="btn btn-secondary" onclick="exportCSV()">⬇ CSV İndir</button>
       <button class="btn btn-secondary" onclick="exportJSON()">⬇ JSON İndir</button>
       <button class="btn btn-primary" onclick="startNew()">Yeni Kayıt +</button>
@@ -2306,6 +2306,497 @@ function startNew() {
   document.getElementById('cat-task').style.display = 'none';
   goScreen('screen-info');
 }
+
+// ════════════════════════════════════════════════════════
+//  DATA TABLE
+// ════════════════════════════════════════════════════════
+const TABLE_COLS = [
+  { key: 'code',              label: 'Öğrenci Kodu',        group: 'Bilgi' },
+  { key: 'grade',             label: 'Sınıf',               group: 'Bilgi' },
+  { key: 'testtype',          label: 'Test Türü',           group: 'Bilgi' },
+  { key: 'datetime',          label: 'Tarih/Saat',          group: 'Bilgi' },
+  { key: 'device',            label: 'Cihaz',               group: 'Bilgi' },
+  { key: 'sleep',             label: 'Uyku',                group: 'Öz-Bildirim' },
+  { key: 'attention_self',    label: 'Dikkat (Öz)',         group: 'Öz-Bildirim' },
+  { key: 'motivation',        label: 'Motivasyon',          group: 'Öz-Bildirim' },
+  { key: 'neuro_total',       label: 'Nöro Toplam',         group: 'Ölçek' },
+  { key: 'neuro_A',           label: 'Değişebilirlik',      group: 'Ölçek' },
+  { key: 'neuro_B',           label: 'Çaba',                group: 'Ölçek' },
+  { key: 'neuro_C',           label: 'Hata',                group: 'Ölçek' },
+  { key: 'neuro_D',           label: 'Öz-Düzenleme',        group: 'Ölçek' },
+  { key: 'stroop_meanRT',     label: 'Stroop Ort.RT',       group: 'Stroop' },
+  { key: 'stroop_medianRT',   label: 'Stroop Med.RT',       group: 'Stroop' },
+  { key: 'stroop_sdRT',       label: 'Stroop SD',           group: 'Stroop' },
+  { key: 'stroop_interf',     label: 'Müdahale (ms)',       group: 'Stroop' },
+  { key: 'stroop_errorRate',  label: 'Hata Oranı %',        group: 'Stroop' },
+  { key: 'stroop_outliers',   label: 'Aykırı Değer',        group: 'Stroop' },
+  { key: 'stroop_congrAcc',   label: 'Uyumlu Doğ.%',       group: 'Stroop' },
+  { key: 'stroop_incongrAcc', label: 'Uyumsuz Doğ.%',      group: 'Stroop' },
+  { key: 'cat_attn',          label: 'Dikkat Skoru',        group: 'CAT' },
+  { key: 'cat_hits',          label: 'İsabetler',           group: 'CAT' },
+  { key: 'cat_misses',        label: 'Kaçırılan',           group: 'CAT' },
+  { key: 'cat_fa',            label: 'Yanlış Alarm',        group: 'CAT' },
+  { key: 'cat_hitRate',       label: 'Hit Rate %',          group: 'CAT' },
+  { key: 'cat_faRate',        label: 'FA Rate %',           group: 'CAT' },
+  { key: 'cat_dprime',        label: "d'",                  group: 'CAT' },
+  { key: 'cat_meanRT',        label: 'CAT Ort.RT',          group: 'CAT' },
+  { key: 'cat_sdRT',          label: 'CAT SD RT',           group: 'CAT' },
+];
+
+let dtState = {
+  sort: { key: 'datetime', dir: 'desc' },
+  filter: '',
+  groupFilter: 'Tümü',
+  rows: []
+};
+
+function sessionToRow(s) {
+  const d = s.data;
+  return {
+    code:              d.student.code || '',
+    grade:             d.student.grade || '',
+    testtype:          d.student.testtype === 'pre' ? 'Ön Test' : 'Son Test',
+    datetime:          d.student.datetime || '',
+    device:            d.student.device || '',
+    sleep:             d.student.sleep ?? '',
+    attention_self:    d.student.attention ?? '',
+    motivation:        d.student.motivation ?? '',
+    neuro_total:       d.scaleScores?.total?.toFixed(2) ?? '',
+    neuro_A:           d.scaleScores?.A?.toFixed(2) ?? '',
+    neuro_B:           d.scaleScores?.B?.toFixed(2) ?? '',
+    neuro_C:           d.scaleScores?.C?.toFixed(2) ?? '',
+    neuro_D:           d.scaleScores?.D?.toFixed(2) ?? '',
+    stroop_meanRT:     d.stroopStats?.meanRT ? Math.round(d.stroopStats.meanRT) : '',
+    stroop_medianRT:   d.stroopStats?.medianRT ? Math.round(d.stroopStats.medianRT) : '',
+    stroop_sdRT:       d.stroopStats?.sdRT ? Math.round(d.stroopStats.sdRT) : '',
+    stroop_interf:     d.stroopStats?.interferenceScore ? Math.round(d.stroopStats.interferenceScore) : '',
+    stroop_errorRate:  d.stroopStats?.errorRate != null ? (d.stroopStats.errorRate*100).toFixed(1) : '',
+    stroop_outliers:   d.stroopStats?.outlierCount ?? '',
+    stroop_congrAcc:   d.stroopStats?.congruentAcc != null ? (d.stroopStats.congruentAcc*100).toFixed(1) : '',
+    stroop_incongrAcc: d.stroopStats?.incongruentAcc != null ? (d.stroopStats.incongruentAcc*100).toFixed(1) : '',
+    cat_attn:          d.catStats?.attentionScore ?? '',
+    cat_hits:          d.catStats?.hits ?? '',
+    cat_misses:        d.catStats?.misses ?? '',
+    cat_fa:            d.catStats?.falseAlarms ?? '',
+    cat_hitRate:       d.catStats?.hitRate != null ? (d.catStats.hitRate*100).toFixed(1) : '',
+    cat_faRate:        d.catStats?.faRate != null ? (d.catStats.faRate*100).toFixed(1) : '',
+    cat_dprime:        d.catStats?.dprime?.toFixed(2) ?? '',
+    cat_meanRT:        d.catStats?.meanRT ? Math.round(d.catStats.meanRT) : '',
+    cat_sdRT:          d.catStats?.sdRT ? Math.round(d.catStats.sdRT) : '',
+  };
+}
+
+function openDataTable() {
+  const all = JSON.parse(localStorage.getItem('neuro_sessions') || '[]');
+  dtState.rows = all.map(sessionToRow);
+  goScreen('screen-datatable');
+  renderDataTable();
+  renderDTCharts();
+}
+
+function renderDataTable() {
+  const groups = ['Tümü', ...new Set(TABLE_COLS.map(c => c.group))];
+  const visibleCols = dtState.groupFilter === 'Tümü'
+    ? TABLE_COLS
+    : TABLE_COLS.filter(c => c.group === dtState.groupFilter || c.key === 'code');
+
+  let rows = [...dtState.rows];
+
+  // Filter
+  if (dtState.filter) {
+    const q = dtState.filter.toLowerCase();
+    rows = rows.filter(r => Object.values(r).some(v => String(v).toLowerCase().includes(q)));
+  }
+
+  // Sort
+  rows.sort((a,b) => {
+    const va = a[dtState.sort.key] ?? '';
+    const vb = b[dtState.sort.key] ?? '';
+    const na = parseFloat(va), nb = parseFloat(vb);
+    const cmp = (!isNaN(na) && !isNaN(nb)) ? na - nb : String(va).localeCompare(String(vb), 'tr');
+    return dtState.sort.dir === 'asc' ? cmp : -cmp;
+  });
+
+  // Group filter tabs
+  const groupTabsHtml = groups.map(g => `
+    <button class="dt-group-btn ${dtState.groupFilter===g?'active':''}" onclick="setDTGroup('${g}')">${g}</button>
+  `).join('');
+
+  // Stat summary
+  const numRows = rows.length;
+  const numStudents = new Set(rows.map(r=>r.code)).size;
+
+  // Table header
+  const thHtml = visibleCols.map(c => {
+    const dir = dtState.sort.key === c.key ? (dtState.sort.dir === 'asc' ? '↑' : '↓') : '';
+    return `<th onclick="sortDT('${c.key}')" title="${c.group}">${c.label} <span class="sort-arrow">${dir}</span></th>`;
+  }).join('');
+
+  // Column averages
+  const avgRow = visibleCols.map(c => {
+    const nums = rows.map(r => parseFloat(r[c.key])).filter(v => !isNaN(v));
+    if (nums.length === 0) return '<td class="dt-avg">—</td>';
+    const avg = nums.reduce((a,b)=>a+b,0)/nums.length;
+    return `<td class="dt-avg">${avg % 1 === 0 ? avg : avg.toFixed(2)}</td>`;
+  }).join('');
+
+  // Table rows
+  const GROUP_COLORS = {
+    'Bilgi': '#64748b', 'Öz-Bildirim': '#f59e0b',
+    'Ölçek': '#00d4ff', 'Stroop': '#7c3aed', 'CAT': '#10b981'
+  };
+
+  const tbodyHtml = rows.length === 0
+    ? `<tr><td colspan="${visibleCols.length}" style="text-align:center;padding:40px;color:var(--text-muted)">Kayıt bulunamadı</td></tr>`
+    : rows.map((r, ri) => {
+        const cells = visibleCols.map(c => {
+          const v = r[c.key];
+          let cls = '';
+          // Color coding for key metrics
+          if (c.key === 'neuro_total') cls = parseFloat(v) >= 4 ? 'dt-good' : parseFloat(v) >= 3 ? 'dt-warn' : 'dt-bad';
+          if (c.key === 'cat_attn') cls = parseFloat(v) >= 70 ? 'dt-good' : parseFloat(v) >= 50 ? 'dt-warn' : 'dt-bad';
+          if (c.key === 'stroop_interf') cls = parseFloat(v) < 50 ? 'dt-good' : parseFloat(v) < 100 ? 'dt-warn' : 'dt-bad';
+          if (c.key === 'cat_faRate') cls = parseFloat(v) < 10 ? 'dt-good' : parseFloat(v) < 20 ? 'dt-warn' : 'dt-bad';
+          return `<td class="${cls}">${v !== '' && v !== null && v !== undefined ? v : '—'}</td>`;
+        }).join('');
+        return `<tr class="${ri%2===0?'dt-row-even':'dt-row-odd'}">${cells}</tr>`;
+      }).join('');
+
+  document.getElementById('dt-container').innerHTML = `
+    <div class="dt-toolbar">
+      <div class="dt-info">
+        <span class="dt-badge">${numRows} kayıt</span>
+        <span class="dt-badge">${numStudents} öğrenci</span>
+      </div>
+      <input class="dt-search" type="text" placeholder="🔍 Ara..." value="${dtState.filter}"
+        oninput="dtState.filter=this.value;renderDataTable()">
+      <button class="btn btn-secondary" style="padding:8px 14px;font-size:12px" onclick="exportAllCSV()">⬇ Tümünü CSV</button>
+      <button class="btn btn-danger" style="padding:8px 14px;font-size:12px" onclick="clearAllData()">🗑 Sil</button>
+    </div>
+
+    <div class="dt-group-tabs">${groupTabsHtml}</div>
+
+    <div class="dt-scroll-wrap">
+      <table class="dt-table">
+        <thead>
+          <tr>${thHtml}</tr>
+          <tr class="dt-avg-row"><td colspan="${visibleCols.length}" style="padding:4px 12px;font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace">ORTALAMA</td></tr>
+          <tr class="dt-avg-row">${avgRow}</tr>
+        </thead>
+        <tbody>${tbodyHtml}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function setDTGroup(g) {
+  dtState.groupFilter = g;
+  renderDataTable();
+}
+
+function sortDT(key) {
+  if (dtState.sort.key === key) {
+    dtState.sort.dir = dtState.sort.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    dtState.sort = { key, dir: 'asc' };
+  }
+  renderDataTable();
+}
+
+function renderDTCharts() {
+  setTimeout(() => {
+    drawDTBarChart('dt-chart-neuro', 'Nöroplastisite Skoru', 'neuro_total', '#00d4ff', [1,5]);
+    drawDTBarChart('dt-chart-attn', 'Dikkat Skoru', 'cat_attn', '#10b981', [0,100]);
+    drawDTBarChart('dt-chart-stroop', 'Stroop Müdahale (ms)', 'stroop_interf', '#7c3aed', [0, null]);
+  }, 100);
+}
+
+function drawDTBarChart(canvasId, title, key, color, yRange) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const rows = dtState.rows.filter(r => r[key] !== '');
+  if (rows.length === 0) { ctx.fillStyle='#64748b'; ctx.font='12px Inter'; ctx.fillText('Veri yok', 10, 20); return; }
+
+  const W = canvas.width, H = canvas.height;
+  const PAD = { t: 30, r: 10, b: 50, l: 45 };
+  const iW = W - PAD.l - PAD.r;
+  const iH = H - PAD.t - PAD.b;
+
+  ctx.clearRect(0,0,W,H);
+
+  const vals = rows.map(r => parseFloat(r[key]));
+  const maxV = yRange[1] || Math.max(...vals) * 1.15;
+  const minV = yRange[0] ?? 0;
+  const range = maxV - minV;
+
+  // Title
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = '11px Inter, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText(title, PAD.l, 16);
+
+  // Grid
+  [0, 0.25, 0.5, 0.75, 1].forEach(f => {
+    const v = minV + f * range;
+    const y = PAD.t + iH - f * iH;
+    ctx.beginPath();
+    ctx.moveTo(PAD.l, y); ctx.lineTo(W - PAD.r, y);
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.fillStyle = '#475569'; ctx.font = '9px DM Mono, monospace'; ctx.textAlign = 'right';
+    ctx.fillText(v.toFixed(0), PAD.l - 4, y + 3);
+  });
+
+  // Bars
+  const barW = Math.min(30, iW / rows.length - 4);
+  rows.forEach((r, i) => {
+    const v = parseFloat(r[key]);
+    const barH = ((v - minV) / range) * iH;
+    const x = PAD.l + (i / rows.length) * iW + (iW / rows.length - barW) / 2;
+    const y = PAD.t + iH - barH;
+
+    ctx.fillStyle = color + '33';
+    ctx.fillRect(x, y, barW, barH);
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, barW, 2);
+
+    // Label
+    ctx.fillStyle = '#64748b'; ctx.font = '9px Inter'; ctx.textAlign = 'center';
+    const lbl = r.code.substring(0,6) + (r.code.length>6?'…':'');
+    ctx.fillText(lbl, x + barW/2, PAD.t + iH + 14);
+    ctx.fillText(r.testtype === 'Ön Test' ? 'Ö' : 'S', x + barW/2, PAD.t + iH + 24);
+  });
+
+  // Average line
+  const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+  const avgY = PAD.t + iH - ((avg - minV) / range) * iH;
+  ctx.beginPath();
+  ctx.moveTo(PAD.l, avgY); ctx.lineTo(W - PAD.r, avgY);
+  ctx.strokeStyle = color + 'aa'; ctx.lineWidth = 1.5;
+  ctx.setLineDash([4,3]); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle = color; ctx.font = '9px DM Mono'; ctx.textAlign = 'right';
+  ctx.fillText('ort: ' + avg.toFixed(1), W - PAD.r, avgY - 4);
+}
+
+function exportAllCSV() {
+  const all = JSON.parse(localStorage.getItem('neuro_sessions') || '[]');
+  if (all.length === 0) { toast('Dışa aktarılacak veri yok.', 'error'); return; }
+
+  const header = TABLE_COLS.map(c => c.label).join(',');
+  const bodyRows = all.map(s => {
+    const r = sessionToRow(s);
+    return TABLE_COLS.map(c => `"${r[c.key] ?? ''}"`).join(',');
+  });
+
+  const csv = [header, ...bodyRows].join('\n');
+  download('neuro_tum_veriler.csv', csv, 'text/csv');
+  toast('Tüm veriler CSV olarak indirildi ✓');
+}
+
+function clearAllData() {
+  if (!confirm('Tüm kayıtlar silinecek. Emin misiniz?')) return;
+  const all = JSON.parse(localStorage.getItem('neuro_sessions') || '[]');
+  all.forEach(s => localStorage.removeItem(s.key));
+  localStorage.removeItem('neuro_sessions');
+  dtState.rows = [];
+  renderDataTable();
+  toast('Tüm veriler silindi.', 'error');
+}
+
 </script>
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 6 — DATA TABLE
+══════════════════════════════════════════════ -->
+<div class="screen" id="screen-datatable">
+  <div class="app-header">
+    <div class="logo">Nöro<span>Farkındalık</span></div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="btn btn-secondary" style="padding:8px 14px;font-size:12px" onclick="goScreen('screen-welcome')">← Ana Sayfa</button>
+    </div>
+  </div>
+  <div style="padding:24px;max-width:100%;position:relative;z-index:1">
+    <div class="section-tag">Araştırma Veri Tabanı</div>
+    <div class="section-title" style="margin-bottom:24px">Tüm Oturum Verileri</div>
+
+    <!-- Mini Charts -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:24px">
+      <div class="chart-wrap" style="margin-bottom:0">
+        <canvas id="dt-chart-neuro" width="300" height="160"></canvas>
+      </div>
+      <div class="chart-wrap" style="margin-bottom:0">
+        <canvas id="dt-chart-attn" width="300" height="160"></canvas>
+      </div>
+      <div class="chart-wrap" style="margin-bottom:0">
+        <canvas id="dt-chart-stroop" width="300" height="160"></canvas>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div id="dt-container"></div>
+  </div>
+</div>
+
+<style>
+/* ── FOOTER ── */
+.zsk-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 32px;
+  background: rgba(10,14,26,.92);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  z-index: 9998;
+  pointer-events: none;
+}
+.zsk-footer span {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+.zsk-footer a {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--accent);
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  pointer-events: all;
+  transition: opacity .2s;
+}
+.zsk-footer a:hover { opacity: 0.75; }
+
+/* push content above footer */
+.screen { padding-bottom: 32px; }
+
+/* ── DATA TABLE STYLES ── */
+.dt-toolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.dt-search {
+  flex: 1;
+  min-width: 180px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 13px;
+  padding: 8px 14px;
+  outline: none;
+}
+.dt-search:focus { border-color: var(--accent); }
+.dt-badge {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 4px 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.dt-info { display: flex; gap: 8px; }
+
+.dt-group-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.dt-group-btn {
+  padding: 5px 14px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: all .15s;
+}
+.dt-group-btn:hover { border-color: var(--accent); color: var(--accent); }
+.dt-group-btn.active { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 600; }
+
+.dt-scroll-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+.dt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  min-width: 600px;
+}
+.dt-table th {
+  padding: 10px 12px;
+  text-align: left;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.dt-table th:hover { color: var(--accent); background: var(--surface); }
+.sort-arrow { color: var(--accent); font-size: 10px; }
+
+.dt-avg-row td {
+  padding: 6px 12px;
+  background: rgba(0,212,255,.05);
+  border-bottom: 1px solid var(--border);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.dt-avg { text-align: right; }
+
+.dt-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid rgba(30,45,69,.4);
+  color: var(--text-dim);
+  white-space: nowrap;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+}
+.dt-row-even td { background: var(--surface); }
+.dt-row-odd td { background: rgba(26,34,53,.5); }
+.dt-table tr:hover td { background: rgba(0,212,255,.05) !important; }
+
+.dt-good { color: var(--accent3) !important; font-weight: 500; }
+.dt-warn { color: var(--warn) !important; }
+.dt-bad  { color: var(--danger) !important; }
+
+.btn-danger { background: rgba(239,68,68,.15); border: 1px solid rgba(239,68,68,.3); color: var(--danger); }
+.btn-danger:hover { background: var(--danger); color: #fff; }
+</style>
+<div class="zsk-footer">
+  <span>Powered by</span>
+  <a href="https://zsksolutions.net.tr" target="_blank">ZSK Solutions</a>
+  <span>·</span>
+  <span>NöroFarkındalık Modülü v1.0</span>
+</div>
+
 </body>
 </html>
