@@ -816,29 +816,36 @@ input[type=range]::-webkit-slider-thumb {
           <p>Kimlik bilgileri, test türü ve kısa refah ölçümü (~3 dk)</p>
         </div>
       </div>
+      <div class="phase-card" style="border-color:rgba(124,58,237,.4)">
+        <div class="phase-num" style="color:#a78bfa;border-color:rgba(124,58,237,.3)">2</div>
+        <div class="phase-info">
+          <h4>Bilimin Doğası Testi</h4>
+          <p>28 çoktan seçmeli soru, bilim anlayışı ölçümü (~10 dk)</p>
+        </div>
+      </div>
       <div class="phase-card">
-        <div class="phase-num">2</div>
+        <div class="phase-num">3</div>
         <div class="phase-info">
           <h4>Nöroplastisite Farkındalık Ölçeği</h4>
           <p>15 madde, 4 alt boyut, Likert ölçek (~5 dk)</p>
         </div>
       </div>
       <div class="phase-card">
-        <div class="phase-num">3</div>
+        <div class="phase-num">4</div>
         <div class="phase-info">
           <h4>Stroop Testi</h4>
           <p>Uyumlu + uyumsuz deneme blokları, tepki süresi ölçümü (~4 dk)</p>
         </div>
       </div>
       <div class="phase-card">
-        <div class="phase-num">4</div>
+        <div class="phase-num">5</div>
         <div class="phase-info">
           <h4>Sürekli Dikkat Görevi</h4>
           <p>Distraktör temelli hedef tespit görevi (~5 dk)</p>
         </div>
       </div>
       <div class="phase-card">
-        <div class="phase-num">5</div>
+        <div class="phase-num">6</div>
         <div class="phase-info">
           <h4>Sonuç Paneli</h4>
           <p>Bireysel rapor, grafikler ve veri dışa aktarımı</p>
@@ -850,6 +857,11 @@ input[type=range]::-webkit-slider-thumb {
       <button class="btn btn-primary" style="width:100%" onclick="goScreen('screen-info')">Başla →</button>
       <button class="btn btn-secondary" style="width:100%" onclick="openDataTable()">📊 Veri Tablosunu Görüntüle</button>
     </div>
+
+    <div style="margin-top:24px;text-align:left">
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">Canlı Kayıt Takibi</div>
+      <div id="live-entries-panel"></div>
+    </div>
   </div>
 </div>
 
@@ -860,15 +872,16 @@ input[type=range]::-webkit-slider-thumb {
   <div class="app-header">
     <div class="logo">Nöro<span>Farkındalık</span></div>
     <div class="step-indicator">
-      <div class="step-dot active" id="dot-1"></div>
-      <div class="step-dot" id="dot-2"></div>
-      <div class="step-dot" id="dot-3"></div>
-      <div class="step-dot" id="dot-4"></div>
-      <div class="step-dot" id="dot-5"></div>
+      <div class="step-dot active"></div>
+      <div class="step-dot"></div>
+      <div class="step-dot"></div>
+      <div class="step-dot"></div>
+      <div class="step-dot"></div>
+      <div class="step-dot"></div>
     </div>
   </div>
   <div class="content">
-    <div class="section-tag">Modül 1 / 5</div>
+    <div class="section-tag">Modül 1 / 6</div>
     <div class="section-title">Öğrenci Bilgileri</div>
     <div class="section-desc">Lütfen aşağıdaki alanları eksiksiz doldurun. Verileriniz yalnızca araştırma amacıyla kullanılacaktır.</div>
 
@@ -954,9 +967,9 @@ input[type=range]::-webkit-slider-thumb {
 </div>
 
 <!-- ══════════════════════════════════════════════
-     SCREEN 2 — NEUROPLASTICITY SCALE
+     SCREEN 2 — BİLİMİN DOĞASI TESTİ
 ══════════════════════════════════════════════ -->
-<div class="screen" id="screen-scale">
+<div class="screen" id="screen-nos">
   <div class="app-header">
     <div class="logo">Nöro<span>Farkındalık</span></div>
     <div class="step-indicator">
@@ -965,10 +978,52 @@ input[type=range]::-webkit-slider-thumb {
       <div class="step-dot"></div>
       <div class="step-dot"></div>
       <div class="step-dot"></div>
+      <div class="step-dot"></div>
     </div>
   </div>
   <div class="content">
-    <div class="section-tag">Modül 2 / 5</div>
+    <div class="section-tag">Modül 2 / 6</div>
+    <div class="section-title">Bilimin Doğası Testi</div>
+    <div class="section-desc">Her soru için size en doğru gelen tek seçeneği işaretleyin. Toplam 28 soru, yaklaşık 10 dakika.</div>
+
+    <div class="alert alert-info">
+      🔬 Bu test bilim hakkındaki kavrayışınızı ölçmektedir. Doğru ya da yanlış cevaplar vardır; içgüdülerinize güvenin.
+    </div>
+
+    <div id="nos-items-container"></div>
+
+    <div style="margin-bottom:24px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-bottom:6px">
+        <span>Cevaplanan</span>
+        <span id="nos-progress-txt">0 / 28</span>
+      </div>
+      <div class="progress-wrap"><div class="progress-bar" id="nos-progress-bar" style="width:0%;background:linear-gradient(90deg,#a78bfa,#7c3aed)"></div></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goScreen('screen-info')">← Geri</button>
+      <button class="btn btn-primary" onclick="submitNOS()">İlerle →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 3 — NEUROPLASTICITY SCALE
+══════════════════════════════════════════════ -->
+<div class="screen" id="screen-scale">
+  <div class="app-header">
+    <div class="logo">Nöro<span>Farkındalık</span></div>
+    <div class="step-indicator">
+      <div class="step-dot done"></div>
+      <div class="step-dot done"></div>
+      <div class="step-dot active"></div>
+      <div class="step-dot"></div>
+      <div class="step-dot"></div>
+      <div class="step-dot"></div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="section-tag">Modül 3 / 6</div>
     <div class="section-title">Nöroplastisite Farkındalık Ölçeği</div>
     <div class="section-desc">Aşağıdaki ifadelerin sizin için ne kadar doğru olduğunu 1 (Hiç Katılmıyorum) ile 5 (Tamamen Katılıyorum) arasında değerlendirin.</div>
 
@@ -994,12 +1049,13 @@ input[type=range]::-webkit-slider-thumb {
 </div>
 
 <!-- ══════════════════════════════════════════════
-     SCREEN 3 — STROOP TEST
+     SCREEN 4 — STROOP TEST
 ══════════════════════════════════════════════ -->
 <div class="screen" id="screen-stroop">
   <div class="app-header">
     <div class="logo">Nöro<span>Farkındalık</span></div>
     <div class="step-indicator">
+      <div class="step-dot done"></div>
       <div class="step-dot done"></div>
       <div class="step-dot done"></div>
       <div class="step-dot active"></div>
@@ -1008,7 +1064,7 @@ input[type=range]::-webkit-slider-thumb {
     </div>
   </div>
   <div class="content">
-    <div class="section-tag">Modül 3 / 5</div>
+    <div class="section-tag">Modül 4 / 6</div>
     <div class="section-title">Stroop Testi</div>
 
     <div id="stroop-intro">
@@ -1064,12 +1120,13 @@ input[type=range]::-webkit-slider-thumb {
       <div class="step-dot done"></div>
       <div class="step-dot done"></div>
       <div class="step-dot done"></div>
+      <div class="step-dot done"></div>
       <div class="step-dot active"></div>
       <div class="step-dot"></div>
     </div>
   </div>
   <div class="content">
-    <div class="section-tag">Modül 4 / 5</div>
+    <div class="section-tag">Modül 5 / 6</div>
     <div class="section-title">Sürekli Dikkat Görevi</div>
 
     <div id="cat-intro">
@@ -1129,6 +1186,7 @@ input[type=range]::-webkit-slider-thumb {
       <div class="step-dot done"></div>
       <div class="step-dot done"></div>
       <div class="step-dot done"></div>
+      <div class="step-dot done"></div>
     </div>
   </div>
   <div class="content" style="max-width:920px">
@@ -1144,12 +1202,14 @@ input[type=range]::-webkit-slider-thumb {
     <!-- Tabs -->
     <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
       <button class="btn btn-primary" id="tab-scale" onclick="showTab('scale')" style="padding:8px 16px;font-size:12px">Ölçek Sonuçları</button>
+      <button class="btn btn-secondary" id="tab-nos" onclick="showTab('nos')" style="padding:8px 16px;font-size:12px">Bilimin Doğası</button>
       <button class="btn btn-secondary" id="tab-stroop" onclick="showTab('stroop')" style="padding:8px 16px;font-size:12px">Stroop Analizi</button>
       <button class="btn btn-secondary" id="tab-cat" onclick="showTab('cat')" style="padding:8px 16px;font-size:12px">Dikkat Görevi</button>
       <button class="btn btn-secondary" id="tab-compare" onclick="showTab('compare')" style="padding:8px 16px;font-size:12px">Karşılaştırma</button>
     </div>
 
     <div id="tab-content-scale" class="tab-pane"></div>
+    <div id="tab-content-nos" class="tab-pane" style="display:none"></div>
     <div id="tab-content-stroop" class="tab-pane" style="display:none"></div>
     <div id="tab-content-cat" class="tab-pane" style="display:none"></div>
     <div id="tab-content-compare" class="tab-pane" style="display:none"></div>
@@ -1169,6 +1229,8 @@ input[type=range]::-webkit-slider-thumb {
 // ════════════════════════════════════════════════════════
 let session = {
   student: {},
+  nosAnswers: {},
+  nosScores: {},
   scaleAnswers: {},
   scaleScores: {},
   stroopTrials: [],
@@ -1227,6 +1289,8 @@ function detectDevice() {
 window.onload = () => {
   document.getElementById('s-datetime').value = autoDateTime();
   renderScaleItems();
+  renderNOSItems();
+  renderLiveEntries();
 };
 
 // ════════════════════════════════════════════════════════
@@ -1253,6 +1317,136 @@ function submitInfo() {
     sleep: +document.getElementById('sl-sleep').value,
     attention: +document.getElementById('sl-attention').value,
     motivation: +document.getElementById('sl-motivation').value
+  };
+
+  // Kayıt anında LocalStorage'a yaz (giriş kaydı)
+  saveEntryRecord();
+
+  goScreen('screen-nos');
+}
+
+function saveEntryRecord() {
+  const entries = JSON.parse(localStorage.getItem('neuro_entries') || '[]');
+  const existing = entries.findIndex(e => e.code === session.student.code && e.testtype === session.student.testtype);
+  const record = {
+    code: session.student.code,
+    grade: session.student.grade,
+    testtype: session.student.testtype,
+    datetime: session.student.datetime,
+    device: session.student.device,
+    status: 'devam-ediyor'
+  };
+  if (existing >= 0) entries[existing] = record;
+  else entries.push(record);
+  localStorage.setItem('neuro_entries', JSON.stringify(entries));
+}
+
+// ════════════════════════════════════════════════════════
+//  MODULE 2 — BİLİMİN DOĞASI TESTİ (NOS)
+// ════════════════════════════════════════════════════════
+const NOS_ITEMS = [
+  { id:1,  q:"Aşağıdakilerden hangisi bilimin amaçlarından DEĞİLDİR?", opts:["doğal dünyayı araştırmak ve anlamak","doğal dünyadaki olayları açıklamak","değişmez gerçeklerden oluşan bir koleksiyon oluşturmak","türetilmiş açıklamaları kullanarak yararlı tahminlerde bulunmak"], answer:2 },
+  { id:2,  q:"Bilim, tarih ve sanat gibi diğer disiplinlerden farklıdır, çünkü bilim şunlara dayanır", opts:["gerçeklere.","açıklamaları test etmeye.","gözlemlere.","teorilere."], answer:1 },
+  { id:3,  q:"Bilim adamları, dinozorların neden neslinin tükendiğini asla kesin olarak bilemeyeceklerdir. Bu nedenle, bilim adamları", opts:["dinozorları incelemeyi bırakıp sadece canlı hayvanları incelemelidir.","araştırma yapmak için canlı dinozorlar yetiştirmelidir.","dinozorların yok oluşu hakkında olabildiğince çok şey öğrenmeye devam etmelidir.","dinozorların yok oluşu hakkındaki mevcut teoriyi en iyi teori olarak kabul etmelidir."], answer:2 },
+  { id:4,  q:"Bilim en iyi şu şekilde tanımlanabilir", opts:["bir dizi gerçek.","bilgi edinme yöntemi.","inançlar koleksiyonu.","kurallar listesi."], answer:1 },
+  { id:5,  q:"Bilim insanlarının çalışmaları genellikle", opts:["bir hipotezi test etmekle.","dikkatli gözlemlerle.","deneyler oluşturmak.","sonuçlar çıkarmak."], answer:1 },
+  { id:6,  q:"Bir bitkinin iki haftalık bir süre içinde 3 cm büyüdüğünün gözlemlenmesinden elde edilen bilgiye ne denir?", opts:["çıkarımlar.","değişkenler.","hipotezler.","veriler."], answer:3 },
+  { id:7,  q:"Gözlemlerinize dayanarak, suyun varlığının ekmek küfünün büyümesini hızlandırabileceğini öne sürüyorsunuz. Bu:", opts:["bir sonuçtur.","bir hipotezdir.","bir deney.","bir analizdir."], answer:1 },
+  { id:8,  q:"Bilimsel bir hipotez", opts:["kişisel inançlara veya görüşlere dayanabilir.","deneyler veya gözlemlerle test edilebilir.","doğru kabul edilmesi için test edilmesine gerek yoktur.","onu destekleyen birçok kanıtla kanıtlanmış bir gerçektir."], answer:1 },
+  { id:9,  q:"Kontrollü bir deney sırasında, bir bilim insanı değiştirir:", opts:["bir sonucu.","bir bilgi yığını.","bir kontrol grubunu.","tek bir değişkeni."], answer:3 },
+  { id:10, q:"Bir öğrenci, bir çiçek üzerinde bir arı görür. Öğrenci, arının çiçekleri nasıl bulduğunu merak eder. Bu öğrenci, şu bilimsel tutumu sergilemektedir:", opts:["yaratıcılık.","merak.","açık fikirlilik.","şüphecilik."], answer:1 },
+  { id:11, q:"Bir bilim insanının, yeni keşfedilen bir virüsün insanları nasıl etkilediğine dair bir hipotez öne sürdüğünü varsayalım. Diğer virüs araştırmacıları muhtemelen:", opts:["hipotezi hemen reddederler.","hipotezi kendi bulgularına uyacak şekilde değiştirirler.","önerilen hipotezi test etmek için yeni deneyler tasarlarlar.","hipotezin tüm virüsler için geçerli olduğunu varsayacaklardır."], answer:2 },
+  { id:12, q:"Yaratıcılık neden bilimsel bir tutum olarak kabul edilir?", opts:["Bilim insanları, fikirlerini açıklamak için iyi posterler hazırlamak için yaratıcılığa ihtiyaç duyarlar.","Yaratıcılık, bilim insanlarının farklı deneyler bulmasına yardımcı olur.","Yaratıcı bilim insanları, deneyleri yapmadan sonuçlarını hayal ederler.","Yaratıcı bilim insanları, hayvanları idare etme ve eğitme konusunda daha iyidir."], answer:1 },
+  { id:13, q:"Bir bilim insanı bir makale yayınladıktan sonra, başkası doğru olmayabileceğine dair kanıt bulur. Bilim insanı yine de yeni kanıtı inceler. Bu hangi bilimsel tutumu sergilemektedir?", opts:["yaratıcılık","merak","açık fikirlilik","şüphecilik"], answer:2 },
+  { id:14, q:"Bir bilim insanı raporu gazetede mi yoksa hakemli dergide mi yayınlamalı? Dergide yayınlamanın bir yararı nedir?", opts:["Diğer bilim insanları, rapordaki her şeyin doğru olduğunu bileceklerdir.","Hakemler, rapordaki deneydeki hataları düzelteceklerdir.","Rapor, dergide daha hızlı yayınlanacaktır.","Raporun kalitesi yüksek bilimsel standartlara uygun olacaktır."], answer:3 },
+  { id:15, q:"Hakemli dergilerde makaleleri kimler inceler?", opts:["Makaleleri yazan bilim insanlarının arkadaşları","Anonim ve bağımsız uzmanlar","deneyleri yapan bilim insanları","deneylerin masraflarını karşılayan kişiler"], answer:1 },
+  { id:16, q:"Hakemli makaleler aracılığıyla fikirlerin paylaşılması bilimin ilerlemesine nasıl yardımcı olur?", opts:["Hakemli makaleler, içerdikleri fikirler çoğu bilim insanı tarafından kabul edildiğinde yayınlanır.","Hakemli makalelerde yer alan deneylerin tekrarlanmasına gerek yoktur.","Makaleleri okuyan bilim insanları, araştırılacak yeni sorular bulabilirler.","Makalelerdeki fikirler her zaman baskın teorileri destekler ve güçlendirir."], answer:2 },
+  { id:17, q:"Bir bilim insanı hakem değerlendirmesini atlayarak sonuçları ulusal televizyonda duyurur. Diğer bilim insanları nasıl tepki verebilir?", opts:["Rapor hakem değerlendirmesinden geçmediği için şüpheci davranacaklardır.","Hastalarında bu yeni tedaviyi hemen uygulamaya başlayacaklar.","Bilim insanını bu keşif için tebrik edeceklerdir.","Çalışmayı kınayacak ve bilim insanını sahtekar olarak nitelendireceklerdir."], answer:0 },
+  { id:18, q:"Bir hakem, akran değerlendirmesi sırasında ne yapar?", opts:["Yazım hatalarına odaklanır.","Sonuçları desteklemek için verileri değiştirir.","Hataları ve önyargıları kontrol eder.","Makaledeki deneyleri tekrarlar."], answer:2 },
+  { id:19, q:"İyi test edilmiş, yeni durumda tahminlerde kullanılabilen ancak belirli bir olayı açıklayamayan bilimsel fikir:", opts:["yanlış bir hipotezdir.","yeniden test edilmesi gereken bir hipotezdir.","reddedilmesi gereken bir teoridir.","revize edilmesi gerekebilecek bir teoridir."], answer:3 },
+  { id:20, q:"Bir teori", opts:["her zaman doğrudur.","bir deneyin giriş cümlesidir.","revize edilebilir veya değiştirilebilir.","çözülmesi gereken bir sorundur."], answer:2 },
+  { id:21, q:"Bilimsel teoriler hipotezlerle nasıl karşılaştırılır?", opts:["Teoriler hipotezlerle aynıdır.","Teoriler, geniş bir yelpazedeki gözlemleri ve hipotezleri birleştirir.","Hipotezler, olayları açıklamak için çeşitli teorilerin fikirlerini birleştirir.","Hipotezler, bilim insanları arasında baskın görüşü oluşturur."], answer:1 },
+  { id:22, q:"Birçok gözlemi açıklayan, iyi test edilmiş bir açıklama:", opts:["bir hipotezdir.","bir çıkarımdır.","bir teoridir.","kontrollü bir deneydir."], answer:2 },
+  { id:23, q:"Aşağıdakilerden hangisi bilim tarafından cevaplanabilecek bir sorudur?", opts:["Güzellik nedir?","Hayvanlar üzerinde deney yapmak etik midir?","DNA bir kişinin sağlığını nasıl etkiler?","İnsanlar çok fazla televizyon izliyor mu?"], answer:2 },
+  { id:24, q:"Kişisel tercih veya bakış açısı:", opts:["bir önyargıdır.","bir teoridir.","bir hipotezdir.","bir çıkarımdır."], answer:0 },
+  { id:25, q:"Toplum, bilimin ilerlemesine nasıl yardımcı olur?", opts:["Toplumun önyargıları, bilim insanlarını belirli fikirleri araştırmaya yönlendirir.","Toplum, bilimde kullanılabilecek teknolojiler üretir.","Toplumun ahlak kuralları, bilim insanlarının doğru kararlar almasına yardımcı olur.","Toplum, bilimin cevaplamasına yardımcı olabileceği sorular ortaya atar."], answer:3 },
+  { id:26, q:"Bilimle uğraşmak, daha iyi bir toplum üyesi olmanıza nasıl yardımcı olur?", opts:["Bilimin önyargılarını öğrenmek, neyin doğru neyin yanlış olduğunu bilmenize yardımcı olur.","Bilimin nasıl işlediğini anlamak, daha iyi kararlar almanıza yardımcı olur.","Bilimsel gerçekleri ezberlemek, daha zeki olmanıza yardımcı olur.","Bilimi bilmek, teknolojinin yardımı olmadan yaşamanıza yardımcı olur."], answer:1 },
+  { id:27, q:"Aşağıdakilerden hangisi bilimin toplumu etkileme şekli DEĞİLDİR?", opts:["Bilim, toplumun bazı pratik sorunlarına cevaplar sunar.","Bilim, topluma zorlu etik sorunlara cevaplar verir.","Bilim, topluma faydalı olan teknolojiyi geliştirir.","Bilim, insanların çevreyi nasıl etkilediğine dair toplumun anlayışını artırır."], answer:1 },
+  { id:28, q:"Bir bilim insanının, başkalarının deneyini daha kolay tekrarlayabilmesi için ne yapması gerekir?", opts:["Zaman kazanmak için kontrol grubu kullanmamalıdır.","Yalnızca bir veri seti toplamalıdır.","Sonuçların daha çabuk elde edilebilmesi için akran değerlendirmesini atlamak.","Prosedürleri ve sonuçları aktarırken metrik sistemi kullanmalıdır."], answer:3 },
+];
+
+function renderNOSItems() {
+  const container = document.getElementById('nos-items-container');
+  if (!container) return;
+  container.innerHTML = '';
+  NOS_ITEMS.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'scale-item';
+    div.id = `nos-item-${item.id}`;
+    div.innerHTML = `
+      <div class="scale-text" style="font-weight:500">${item.id}. ${item.q}</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
+        ${['a','b','c','d'].map((ltr,i) => `
+          <button class="nos-opt-btn" id="nos-${item.id}-${i}" data-item="${item.id}" data-idx="${i}"
+            onclick="selectNOS(${item.id},${i},this)"
+            style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;text-align:left;color:var(--text-dim);font-size:13px;transition:all .15s;font-family:'Inter',sans-serif">
+            <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);flex-shrink:0;width:14px">${ltr})</span>
+            <span>${item.opts[i]}</span>
+          </button>
+        `).join('')}
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function selectNOS(itemId, idx, btn) {
+  // Clear previous selection for this item
+  for (let i = 0; i < 4; i++) {
+    const b = document.getElementById(`nos-${itemId}-${i}`);
+    if (b) {
+      b.style.background = 'var(--surface2)';
+      b.style.borderColor = 'var(--border)';
+      b.style.color = 'var(--text-dim)';
+    }
+  }
+  btn.style.background = 'rgba(124,58,237,.2)';
+  btn.style.borderColor = '#7c3aed';
+  btn.style.color = '#a78bfa';
+  session.nosAnswers[itemId] = idx;
+  updateNOSProgress();
+}
+
+function updateNOSProgress() {
+  const answered = Object.keys(session.nosAnswers).length;
+  document.getElementById('nos-progress-txt').textContent = `${answered} / 28`;
+  document.getElementById('nos-progress-bar').style.width = `${(answered/28)*100}%`;
+}
+
+function submitNOS() {
+  const answered = Object.keys(session.nosAnswers).length;
+  if (answered < NOS_ITEMS.length) {
+    toast(`${NOS_ITEMS.length - answered} soru cevaplanmadı.`, 'error');
+    const unanswered = NOS_ITEMS.find(i => session.nosAnswers[i.id] === undefined);
+    if (unanswered) {
+      document.getElementById(`nos-item-${unanswered.id}`).scrollIntoView({behavior:'smooth'});
+      document.getElementById(`nos-item-${unanswered.id}`).style.borderColor = 'var(--danger)';
+      setTimeout(() => document.getElementById(`nos-item-${unanswered.id}`).style.borderColor = '', 2000);
+    }
+    return;
+  }
+
+  // Scoring
+  let correct = 0;
+  NOS_ITEMS.forEach(item => {
+    if (session.nosAnswers[item.id] === item.answer) correct++;
+  });
+
+  session.nosScores = {
+    correct,
+    total: NOS_ITEMS.length,
+    percentage: Math.round((correct / NOS_ITEMS.length) * 100),
+    answers: { ...session.nosAnswers }
   };
 
   goScreen('screen-scale');
@@ -1780,9 +1974,97 @@ function normInv(p) {
 function saveToLocalStorage() {
   const key = `neuro_${session.student.code}_${session.student.testtype}_${Date.now()}`;
   const all = JSON.parse(localStorage.getItem('neuro_sessions') || '[]');
-  all.push({ key, data: session, saved: new Date().toISOString() });
-  localStorage.setItem('neuro_sessions', JSON.stringify(all));
+  // Remove older session with same code+testtype if exists
+  const filtered = all.filter(s => !(s.data.student.code === session.student.code && s.data.student.testtype === session.student.testtype));
+  filtered.push({ key, data: session, saved: new Date().toISOString() });
+  localStorage.setItem('neuro_sessions', JSON.stringify(filtered));
   localStorage.setItem(key, JSON.stringify(session));
+
+  // Update entries record to completed
+  const entries = JSON.parse(localStorage.getItem('neuro_entries') || '[]');
+  const idx = entries.findIndex(e => e.code === session.student.code && e.testtype === session.student.testtype);
+  if (idx >= 0) entries[idx].status = 'tamamlandı';
+  localStorage.setItem('neuro_entries', JSON.stringify(entries));
+}
+
+// ════════════════════════════════════════════════════════
+//  LIVE ENTRY TRACKER (welcome screen)
+// ════════════════════════════════════════════════════════
+function renderLiveEntries() {
+  const el = document.getElementById('live-entries-panel');
+  if (!el) return;
+  const entries = JSON.parse(localStorage.getItem('neuro_entries') || '[]');
+  const sessions = JSON.parse(localStorage.getItem('neuro_sessions') || '[]');
+
+  if (entries.length === 0) {
+    el.innerHTML = '<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:12px">Henüz kayıt yok.</div>';
+    return;
+  }
+
+  // Merge entries with session completion data
+  const rows = entries.map(e => {
+    const sess = sessions.find(s => s.data.student.code === e.code && s.data.student.testtype === e.testtype);
+    const hasNOS = sess?.data?.nosScores?.correct !== undefined;
+    const hasScale = sess?.data?.scaleScores?.total !== undefined;
+    const hasStroop = sess?.data?.stroopStats?.meanRT !== undefined;
+    const hasCAT = sess?.data?.catStats?.attentionScore !== undefined;
+    const done = [hasNOS, hasScale, hasStroop, hasCAT].filter(Boolean).length;
+    return { ...e, done, total: 4 };
+  }).sort((a,b) => new Date(b.datetime) - new Date(a.datetime));
+
+  const completed = rows.filter(r => r.status === 'tamamlandı').length;
+  const inProgress = rows.filter(r => r.status !== 'tamamlandı').length;
+
+  el.innerHTML = `
+    <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+      <div class="stat-box" style="flex:1;min-width:80px;padding:10px">
+        <div class="stat-val" style="font-size:20px">${rows.length}</div>
+        <div class="stat-lbl">Toplam Giriş</div>
+      </div>
+      <div class="stat-box" style="flex:1;min-width:80px;padding:10px">
+        <div class="stat-val" style="font-size:20px;color:var(--accent3)">${completed}</div>
+        <div class="stat-lbl">Tamamlanan</div>
+      </div>
+      <div class="stat-box" style="flex:1;min-width:80px;padding:10px">
+        <div class="stat-val" style="font-size:20px;color:var(--warn)">${inProgress}</div>
+        <div class="stat-lbl">Devam Eden</div>
+      </div>
+    </div>
+    <div style="max-height:220px;overflow-y:auto;border-radius:var(--radius-sm);border:1px solid var(--border)">
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <thead>
+          <tr style="background:var(--surface2);position:sticky;top:0">
+            <th style="padding:8px 10px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);border-bottom:1px solid var(--border)">Kod</th>
+            <th style="padding:8px 10px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);border-bottom:1px solid var(--border)">Tür</th>
+            <th style="padding:8px 10px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);border-bottom:1px solid var(--border)">Tarih</th>
+            <th style="padding:8px 10px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);border-bottom:1px solid var(--border)">İlerleme</th>
+            <th style="padding:8px 10px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);border-bottom:1px solid var(--border)">Durum</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map((r,i) => `
+            <tr style="background:${i%2===0?'var(--surface)':'rgba(26,34,53,.5)'}">
+              <td style="padding:7px 10px;color:var(--text);font-family:'DM Mono',monospace">${r.code}</td>
+              <td style="padding:7px 10px;color:var(--text-dim)">${r.testtype === 'pre' ? 'Ön' : 'Son'}</td>
+              <td style="padding:7px 10px;color:var(--text-muted)">${r.datetime ? r.datetime.split(' ')[0] : '—'}</td>
+              <td style="padding:7px 10px">
+                <div style="display:flex;gap:3px">
+                  ${['BDT','Ölçek','Stroop','CAT'].map((_,j) => `
+                    <div style="width:14px;height:14px;border-radius:3px;background:${j < r.done ? 'var(--accent3)' : 'var(--border)'};title='${_}'"></div>
+                  `).join('')}
+                </div>
+              </td>
+              <td style="padding:7px 10px">
+                <span style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:99px;background:${r.status==='tamamlandı'?'rgba(16,185,129,.15)':'rgba(245,158,11,.12)'};color:${r.status==='tamamlandı'?'var(--accent3)':'var(--warn)'}">
+                  ${r.status === 'tamamlandı' ? '✓ Tamam' : '● Devam'}
+                </span>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
 }
 
 // ════════════════════════════════════════════════════════
@@ -1790,10 +2072,114 @@ function saveToLocalStorage() {
 // ════════════════════════════════════════════════════════
 function buildResultsPage() {
   buildReportHeader();
+  buildNOSTab();
   buildScaleTab();
   buildStroopTab();
   buildCATTab();
   buildCompareTab();
+}
+
+function buildNOSTab() {
+  const ns = session.nosScores;
+  const pct = ns.percentage || 0;
+  const correct = ns.correct || 0;
+  const total = ns.total || 28;
+  const wrong = total - correct;
+
+  const level = pct >= 80 ? { lbl:'Yüksek Anlayış', color:'var(--accent3)' }
+    : pct >= 60 ? { lbl:'Orta Anlayış', color:'var(--warn)' }
+    : { lbl:'Geliştirilmeli', color:'var(--danger)' };
+
+  // Question-by-question breakdown
+  const breakdown = NOS_ITEMS.map(item => {
+    const given = ns.answers?.[item.id];
+    const isCorrect = given === item.answer;
+    return { id: item.id, q: item.q.substring(0,60) + '…', correct: isCorrect, given: given !== undefined ? ['a','b','c','d'][given] : '—', expected: ['a','b','c','d'][item.answer] };
+  });
+
+  document.getElementById('tab-content-nos').innerHTML = `
+    <div class="card">
+      <div class="card-title">Bilimin Doğası Testi Sonucu</div>
+      <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;padding:8px 0">
+        <div style="text-align:center">
+          <div style="font-family:'DM Mono',monospace;font-size:56px;font-weight:500;color:${level.color};line-height:1">${pct}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px">% Başarı</div>
+        </div>
+        <div style="flex:1;min-width:180px">
+          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:${level.color};margin-bottom:8px">${level.lbl}</div>
+          <div class="progress-wrap" style="margin-bottom:6px">
+            <div class="progress-bar" style="width:${pct}%;background:${level.color}"></div>
+          </div>
+          <div style="display:flex;gap:16px;font-size:12px;margin-top:10px">
+            <span style="color:var(--accent3)">✓ ${correct} Doğru</span>
+            <span style="color:var(--danger)">✗ ${wrong} Yanlış</span>
+            <span style="color:var(--text-muted)">/ ${total} Soru</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Soru Bazlı Analiz</div>
+      <div style="max-height:340px;overflow-y:auto">
+        <table class="result-table">
+          <tr><th>#</th><th>Soru</th><th>Verilen</th><th>Doğru</th><th>Sonuç</th></tr>
+          ${breakdown.map(b => `
+            <tr>
+              <td style="font-family:'DM Mono',monospace;color:var(--text-muted)">${b.id}</td>
+              <td style="max-width:280px;white-space:normal;font-size:11px">${b.q}</td>
+              <td style="font-family:'DM Mono',monospace">${b.given}</td>
+              <td style="font-family:'DM Mono',monospace;color:var(--accent3)">${b.expected}</td>
+              <td>${b.correct ? '<span style="color:var(--accent3)">✓</span>' : '<span style="color:var(--danger)">✗</span>'}</td>
+            </tr>
+          `).join('')}
+        </table>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Doğru / Yanlış Dağılımı</div>
+      <canvas id="nos-chart" width="500" height="160"></canvas>
+    </div>
+  `;
+  setTimeout(() => drawNOSChart(), 100);
+}
+
+function drawNOSChart() {
+  const canvas = document.getElementById('nos-chart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const ns = session.nosScores;
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  const items = NOS_ITEMS;
+  const barW = (W - 60) / items.length;
+
+  items.forEach((item, i) => {
+    const isCorrect = ns.answers?.[item.id] === item.answer;
+    const x = 30 + i * barW;
+    const bH = 60;
+    const y = H/2 - bH/2;
+
+    ctx.fillStyle = isCorrect ? 'rgba(16,185,129,.7)' : 'rgba(239,68,68,.7)';
+    ctx.fillRect(x + 1, y, barW - 2, bH);
+
+    ctx.fillStyle = isCorrect ? '#10b981' : '#ef4444';
+    ctx.font = '8px DM Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(item.id, x + barW/2, H - 8);
+  });
+
+  // Legend
+  ctx.fillStyle = '#10b981';
+  ctx.fillRect(30, 8, 10, 10);
+  ctx.fillStyle = '#94a3b8'; ctx.font = '10px Inter'; ctx.textAlign = 'left';
+  ctx.fillText('Doğru', 44, 17);
+  ctx.fillStyle = '#ef4444';
+  ctx.fillRect(90, 8, 10, 10);
+  ctx.fillStyle = '#94a3b8';
+  ctx.fillText('Yanlış', 104, 17);
 }
 
 function buildReportHeader() {
@@ -2210,17 +2596,17 @@ function buildCompareTab() {
 }
 
 function showTab(name) {
-  ['scale','stroop','cat','compare'].forEach(t => {
+  ['scale','nos','stroop','cat','compare'].forEach(t => {
     document.getElementById(`tab-content-${t}`).style.display = 'none';
-    document.getElementById(`tab-${t}`).className = 'btn btn-secondary';
-    document.getElementById(`tab-${t}`).style.cssText = 'padding:8px 16px;font-size:12px';
+    const btn = document.getElementById(`tab-${t}`);
+    if (btn) { btn.className = 'btn btn-secondary'; btn.style.cssText = 'padding:8px 16px;font-size:12px'; }
   });
   document.getElementById(`tab-content-${name}`).style.display = 'block';
-  document.getElementById(`tab-${name}`).className = 'btn btn-primary';
-  document.getElementById(`tab-${name}`).style.cssText = 'padding:8px 16px;font-size:12px';
+  const activeBtn = document.getElementById(`tab-${name}`);
+  if (activeBtn) { activeBtn.className = 'btn btn-primary'; activeBtn.style.cssText = 'padding:8px 16px;font-size:12px'; }
 
-  // Redraw charts
   if (name === 'scale') setTimeout(drawScaleRadar, 50);
+  if (name === 'nos') setTimeout(drawNOSChart, 50);
   if (name === 'stroop') setTimeout(drawStroopChart, 50);
   if (name === 'cat') setTimeout(drawCATChart, 50);
 }
@@ -2239,11 +2625,14 @@ function exportCSV() {
   csv += `Uyku,${s.student.sleep}\n`;
   csv += `Dikkat (Öz-bildirim),${s.student.attention}\n`;
   csv += `Motivasyon,${s.student.motivation}\n`;
-  csv += `Nöroplastisite Toplam,${s.scaleScores.total.toFixed(2)}\n`;
-  csv += `Alt Boyut A (Değişebilirlik),${s.scaleScores.A.toFixed(2)}\n`;
-  csv += `Alt Boyut B (Çaba),${s.scaleScores.B.toFixed(2)}\n`;
-  csv += `Alt Boyut C (Hata),${s.scaleScores.C.toFixed(2)}\n`;
-  csv += `Alt Boyut D (Öz-Düzenleme),${s.scaleScores.D.toFixed(2)}\n`;
+  csv += `BDT Doğru,${s.nosScores?.correct ?? ''}\n`;
+  csv += `BDT Toplam,${s.nosScores?.total ?? ''}\n`;
+  csv += `BDT Yüzde,${s.nosScores?.percentage ?? ''}%\n`;
+  csv += `Nöroplastisite Toplam,${s.scaleScores.total?.toFixed(2)}\n`;
+  csv += `Alt Boyut A (Değişebilirlik),${s.scaleScores.A?.toFixed(2)}\n`;
+  csv += `Alt Boyut B (Çaba),${s.scaleScores.B?.toFixed(2)}\n`;
+  csv += `Alt Boyut C (Hata),${s.scaleScores.C?.toFixed(2)}\n`;
+  csv += `Alt Boyut D (Öz-Düzenleme),${s.scaleScores.D?.toFixed(2)}\n`;
   csv += `Stroop Ort. RT (ms),${Math.round(s.stroopStats.meanRT)}\n`;
   csv += `Stroop Medyan RT (ms),${Math.round(s.stroopStats.medianRT)}\n`;
   csv += `Stroop Müdahale Skoru,${Math.round(s.stroopStats.interferenceScore)}\n`;
@@ -2258,6 +2647,14 @@ function exportCSV() {
   csv += `d',${s.catStats.dprime.toFixed(2)}\n`;
   csv += `Dikkat Ort. RT (ms),${Math.round(s.catStats.meanRT)}\n`;
   csv += `Dikkat SD RT (ms),${Math.round(s.catStats.sdRT)}\n`;
+
+  csv += '\n--- BDT SORULARI ---\n';
+  csv += 'Soru No,Verilen,Doğru Cevap,Sonuç\n';
+  NOS_ITEMS.forEach(item => {
+    const given = s.nosScores?.answers?.[item.id];
+    const isCorrect = given === item.answer;
+    csv += `${item.id},${given !== undefined ? ['a','b','c','d'][given] : '—'},${['a','b','c','d'][item.answer]},${isCorrect ? 'Doğru' : 'Yanlış'}\n`;
+  });
 
   csv += '\n--- STROOP DENEMELERİ ---\n';
   csv += 'Deneme,Kelime,Mürekkep Rengi,Tepki,Doğru,Uyumlu,RT (ms),Aykırı\n';
@@ -2289,7 +2686,7 @@ function download(filename, content, type) {
 }
 
 function startNew() {
-  session = { student:{}, scaleAnswers:{}, scaleScores:{}, stroopTrials:[], stroopStats:{}, catTrials:[], catStats:{} };
+  session = { student:{}, nosAnswers:{}, nosScores:{}, scaleAnswers:{}, scaleScores:{}, stroopTrials:[], stroopStats:{}, catTrials:[], catStats:{} };
   document.getElementById('s-code').value = '';
   document.getElementById('s-grade').value = '';
   document.getElementById('s-testtype').value = '';
@@ -2300,10 +2697,14 @@ function startNew() {
   });
   renderScaleItems();
   updateScaleProgress();
+  renderNOSItems();
+  document.getElementById('nos-progress-txt').textContent = '0 / 28';
+  document.getElementById('nos-progress-bar').style.width = '0%';
   document.getElementById('stroop-intro').style.display = '';
   document.getElementById('stroop-task').style.display = 'none';
   document.getElementById('cat-intro').style.display = '';
   document.getElementById('cat-task').style.display = 'none';
+  renderLiveEntries();
   goScreen('screen-info');
 }
 
@@ -2316,9 +2717,13 @@ const TABLE_COLS = [
   { key: 'testtype',          label: 'Test Türü',           group: 'Bilgi' },
   { key: 'datetime',          label: 'Tarih/Saat',          group: 'Bilgi' },
   { key: 'device',            label: 'Cihaz',               group: 'Bilgi' },
+  { key: 'status',            label: 'Durum',               group: 'Bilgi' },
   { key: 'sleep',             label: 'Uyku',                group: 'Öz-Bildirim' },
   { key: 'attention_self',    label: 'Dikkat (Öz)',         group: 'Öz-Bildirim' },
   { key: 'motivation',        label: 'Motivasyon',          group: 'Öz-Bildirim' },
+  { key: 'nos_correct',       label: 'BDT Doğru',           group: 'BDT' },
+  { key: 'nos_total',         label: 'BDT Toplam',          group: 'BDT' },
+  { key: 'nos_pct',           label: 'BDT %',               group: 'BDT' },
   { key: 'neuro_total',       label: 'Nöro Toplam',         group: 'Ölçek' },
   { key: 'neuro_A',           label: 'Değişebilirlik',      group: 'Ölçek' },
   { key: 'neuro_B',           label: 'Çaba',                group: 'Ölçek' },
@@ -2352,15 +2757,27 @@ let dtState = {
 
 function sessionToRow(s) {
   const d = s.data;
+  // Determine completion status
+  const hasNOS = d.nosScores && d.nosScores.correct !== undefined;
+  const hasScale = d.scaleScores && d.scaleScores.total !== undefined;
+  const hasStroop = d.stroopStats && d.stroopStats.meanRT !== undefined;
+  const hasCAT = d.catStats && d.catStats.attentionScore !== undefined;
+  const completedCount = [hasNOS, hasScale, hasStroop, hasCAT].filter(Boolean).length;
+  const status = completedCount === 4 ? 'tamamlandı' : completedCount === 0 ? 'başladı' : `devam (${completedCount}/4)`;
+
   return {
     code:              d.student.code || '',
     grade:             d.student.grade || '',
     testtype:          d.student.testtype === 'pre' ? 'Ön Test' : 'Son Test',
     datetime:          d.student.datetime || '',
     device:            d.student.device || '',
+    status,
     sleep:             d.student.sleep ?? '',
     attention_self:    d.student.attention ?? '',
     motivation:        d.student.motivation ?? '',
+    nos_correct:       hasNOS ? d.nosScores.correct : '',
+    nos_total:         hasNOS ? d.nosScores.total : '',
+    nos_pct:           hasNOS ? d.nosScores.percentage : '',
     neuro_total:       d.scaleScores?.total?.toFixed(2) ?? '',
     neuro_A:           d.scaleScores?.A?.toFixed(2) ?? '',
     neuro_B:           d.scaleScores?.B?.toFixed(2) ?? '',
